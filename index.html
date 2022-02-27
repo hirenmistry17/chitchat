@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RTC</title>
+
+    <!-- <script src="/client.js" type="module" ></script> -->
+    <script src="./socket.io/socket.io.js"></script>
+
+    <style>
+        body {
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            height: 100vh;
+            width: 90%;
+            max-width: 1200px;
+        }
+
+        #message-container {
+            border: 1px solid black;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        #message-container div {
+            background-color: beige;
+            padding: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+
+
+    <div id="message-container"></div>
+    <form id="form">
+        <div>
+            <label>Room is : </label>
+            <div id="room-input"></div>
+        </div>
+        <div>
+            <label>Message</label>
+            <input type="text" id="message-input" autocomplete="off">
+            <button type="submit" autocomplete="off">Join</button>
+        </div>
+    </form>
+</body>
+
+</html>
+
+<script>
+    var socket = io('http://localhost:3000/');
+
+    let room = prompt("Please enter room");
+
+    const roominput = document.getElementById('room-input');
+
+    if (room) {
+        roominput.innerHTML = room;
+        socket.emit('newroom', room);
+    }
+    const submitBtn = document.getElementById('form');
+    const inputMsg = document.getElementById('message-input');
+    const messageContainer = document.getElementById('message-container');
+
+    const roomBtn = document.getElementById('send-room');
+
+    submitBtn.addEventListener('submit', (e) => {
+
+        e.preventDefault();
+        socket.emit('message', inputMsg.value, room);
+        inputMsg.value = '';
+    });
+
+
+    socket.on('messagerecived', (data) => {
+        console.log("messagerecived==>", data);
+        const container = document.createElement('li');
+        container.innerHTML = data;
+        messageContainer.appendChild(container);
+    });
+
+
+
+</script>
+<!-- <script src="./client.js" ></script> -->
